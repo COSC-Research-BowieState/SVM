@@ -161,7 +161,7 @@ class ARP_Simulator:
         for i in range(wLen,N_train-1):
             #Input consists of present state and wLen previous states
             for k in  range(N_train-wLen):
-                print(totalAvgPwr[1])
+            
                 trainData.itemset((i,k),totalAvgPwr[k,i-wLen+1])
 
 
