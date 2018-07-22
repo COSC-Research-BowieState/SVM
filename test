@@ -1,8 +1,0 @@
-for i = wLen:N_train-1
-    %Input consists of present state and wLen previous states
-    disp(i-wLen);
-    disp(wLen);
-    disp(i);
-    break;
-    trainData(:,i-wLen+1) = real(totalAvgPwr(i-wLen+1:i));
-end

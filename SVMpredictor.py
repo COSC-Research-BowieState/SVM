@@ -9,8 +9,9 @@ Created on Sat Jul 14 00:17:53 2018
 import numpy as np
 #import matplotlib.pyplot as plt
 import time as tic
-from sklearn import svm
+from sklearn.svm import SVR, SVC
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 N = 300
 dLen = 100 #length of the energy detector
@@ -26,7 +27,8 @@ datas = np.transpose(data)
 
 print(tic.time())
 #input window length
-trainLbl = np.zeros((1,N_train-wLen));
+trainLbl = np.zeros((1,N_train-1));
+
 for i in np.arange(N_train-wLen):
     trainLbl.itemset(i,datas[0,i]); 
     
@@ -45,16 +47,19 @@ for b in np.arange(N_test):
         testData[t,b-wLen-1] = np.abs(datas[0,b+t-1]);
         
 predAcc_obs2_coh = np.zeros((dLen,1));
-theSVR = svm.SVR(kernel='linear')
-"""
-Error message - 
-ValueError: Expected 2D array, got 1D array instead:
-array=[1.02042227e-05 1.01761438e-05 1.02209320e-05 ... 1.00228807e-05
- 1.00395029e-05 1.00579164e-05].
-Reshape your data either using array.reshape(-1, 1) if your data has a single feature or array.reshape(1, -1) if it contains a single sample.
-"""
+theSVR = SVR(kernel='linear',max_iter=10)
+print("Starting to fit model")
 
-test= theSVR.fit(trainData.flatten(),trainLbl.flatten())
 
+label_reshape = trainLbl.reshape((N_train-1))
+train_reshape = trainData.transpose()
+testData_reshape = testData.transpose()
+clf = theSVR.fit(train_reshape,label_reshape)
+print(clf.predict(testData_reshape))
 fSteps = dLen; #tracks number of future steps to predict
-predicted = np.zeros((fSteps, N_test-wLen));
+predicted = np.zeros((fSteps, N_test-wLen-1));
+
+nData = testData_reshape;
+for i in np.arange(0,5):
+    predicted[i] = clf.predict(nData);
+    #nData = [predicted[i]]

@@ -39,6 +39,7 @@ predicted = zeros(fSteps, N_test-wLen);
 nData = testData;
 for i=1:5
     predicted(i,:) = predict(theSVM, nData')';
+    disp(predicted(i,:))
     nData = [testData(2:wLen,:); predicted(i,:)];
 end
 
