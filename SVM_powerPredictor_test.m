@@ -160,7 +160,7 @@ for i=1:N_test-wLen
         re_UA = re_UA + 1;
     end
 end
-
+%{
 %Sliding observed accuracies
 %dominant state
 predAcc_obs1 = (sum(predState_1step(ambState==0) == trueState(1,ambState...
@@ -228,7 +228,7 @@ for i=1:dLen-1
         predState_1step(ambState(1+i:dLen:N_test-wLen-i)==1) == (obsState(...
         predPwrStates(1,ambState(1+i:dLen:N_test-wLen-i)==1)))))/(N_test-wLen)*dLen;
 end
-
+%}
 
 %Plot one-step ahead prediction with threshold
 %{
