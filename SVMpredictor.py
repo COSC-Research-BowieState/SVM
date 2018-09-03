@@ -37,6 +37,7 @@ for i in np.arange(wLen,N_train-1):
 #Traing and test input data
 trainData = np.zeros((wLen,N_train-wLen));
 testData = np.zeros((wLen,N_test-wLen));
+trailData = np.zeros((wLen,N_test-wLen));
 ###### totalAvgPwr is one-dimensional array#####
 ###### trainData in a multi-dimensional array######
 
@@ -44,13 +45,13 @@ for s in np.arange(r):
     for k in  np.arange(wLen-1):
         trainData.itemset((k,s),np.real(datas[0,s+k]))
 
-a = N_test-1
-c = wLen-1
+a = N_test
+
+'''Rework testData'''
 for b in np.arange(a-wLen):
-    print(b)
     for t in  np.arange(wLen-1):
-        testData[t,b] = np.real(datas[0,N_train+t]);
-        
+        testData.itemset((t,b),np.real(datas[0,N_train+t+b]));
+'''======= End Test ========='''
 predAcc_obs2_coh = np.zeros((dLen,1));
 theSVR = LinearSVR()
 print("Starting to fit model")
@@ -66,8 +67,9 @@ score = np.zeros((0,N_test));
 predicted = np.zeros((fSteps, N_test-wLen));
 
 nData = testData_reshape;
+
 for i in np.arange(0,sample_len):
-    predicted[i] = clf.predict(testData.conj().transpose()).conj().transpose();
+    predicted[i] = clf.predict(testData.conj().transpose());
     nData = np.concatenate((testData[1:wLen:,],predicted[i:sample_len]));
 
 
@@ -82,11 +84,14 @@ for i in np.arange(0,N_test-wLen):
     else:
         setCnt = setCnt + 1;
     
-    
-score = predicted[0:sample_len];
+print(N_test-wLen)
+#score = predicted[1,:]
+score = predicted[0,:];
 fig, ax = plt.subplots()
-plt.plot(np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(np.real(datas[wLen:N])))-30,np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(abs(score))-30)
+plt.plot(np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30)
+''',np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30'''
 #plt.plot(0:N_test-wLen,10*np.log10(np.abs(score))-30)
+#,np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30
 '''
 10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
     1:N_test-wLen,10*log10(abs(score))-30

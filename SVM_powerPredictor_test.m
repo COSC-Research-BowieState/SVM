@@ -5,7 +5,7 @@ wLen = 5*dLen; %input window length
 N_train = dLen*N/2-dLen+1; %training data length
 N_test = dLen*N/2; %test data length
 N = N_train+N_test; %total data length (THIS N IS DIFFERENT THAN N IN ARP_simulator.m)
-disp(N_train+N_test)
+
 %Training label ground truth/target
 trainLbl = real(totalAvgPwr(wLen+1:N_train));
 
@@ -74,7 +74,7 @@ xlabel('Samples')
 ylabel('Magnitude (dBm)')
 title('one-step ahead prediction')
 
-%{
+
 MSE_multistep = zeros(fSteps,1);
 for i=1:fSteps
     %measures multistep MSE
@@ -100,7 +100,7 @@ for i=1:fSteps
         title('multi-step ahead prediction')
     end
 end
-%}
+
 
 P_fa = 0.01; %probability of false alarm
 %energy detector threshold
@@ -160,7 +160,7 @@ for i=1:N_test-wLen
         re_UA = re_UA + 1;
     end
 end
-%{
+
 %Sliding observed accuracies
 %dominant state
 predAcc_obs1 = (sum(predState_1step(ambState==0) == trueState(1,ambState...
@@ -228,10 +228,10 @@ for i=1:dLen-1
         predState_1step(ambState(1+i:dLen:N_test-wLen-i)==1) == (obsState(...
         predPwrStates(1,ambState(1+i:dLen:N_test-wLen-i)==1)))))/(N_test-wLen)*dLen;
 end
-%}
+
 
 %Plot one-step ahead prediction with threshold
-%{
+
 figure
 plot(1:N_test-wLen,10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
 1:N_test-wLen,10*log10(abs(score))-30,1:N_test-wLen,10*log10(thresh*ones(1,N_test-wLen))-30)
@@ -239,7 +239,7 @@ legend('Input Signal','Prediction')
 xlabel('Samples')
 ylabel('Magnitude (dBm)')
 title('one-step ahead prediction')
-%}
+
 
 
 %{
@@ -270,12 +270,12 @@ pred_mdRate = sum(~(predState).*occSwitch(N_test+1+wLen:N-fSteps+1))/...
 %}
 
 %plots actual total average power vs. predicted power
-%{
+
 figure
 plot(N_train+wLen+1:N-fSteps+1,10*log10(abs(totalAvgPwr(...
     N_train+wLen+1:N-fSteps+1)))-30,N_train+wLen+1:N-fSteps+1,...
     10*log10(abs(score(1,:)))-30,N_train+wLen+1:N-fSteps+1,...
     10*log10(ones(1,length(predPwrStates))*thresh)-30)
-%}
+
 
 toc
