@@ -9,7 +9,7 @@ Created on Sat Jul 14 00:17:53 2018
 import numpy as np
 import matplotlib.pyplot as plt
 import time as tic
-from sklearn.svm import LinearSVR
+from sklearn.svm import SVR,LinearSVR
 import pandas as pd
 #from sklearn.model_selection import train_test_split
 
@@ -53,7 +53,9 @@ for b in np.arange(a-wLen):
         testData.itemset((t,b),np.real(datas[0,N_train+t+b]));
 '''======= End Test ========='''
 predAcc_obs2_coh = np.zeros((dLen,1));
+
 theSVR = LinearSVR()
+
 print("Starting to fit model")
 print(tic.clock())
 
@@ -63,7 +65,7 @@ testData_reshape = testData.conj().transpose()
 clf = theSVR.fit(train_reshape,label_reshape)
 
 fSteps = dLen; #tracks number of future steps to predict
-score = np.zeros((0,N_test));
+score = np.zeros((1,N_test));
 predicted = np.zeros((fSteps, N_test-wLen));
 
 nData = testData_reshape;
@@ -72,10 +74,10 @@ for i in np.arange(0,sample_len):
     predicted[i] = clf.predict(testData.conj().transpose());
     nData = np.concatenate((testData[1:wLen:,],predicted[i:sample_len]));
 
-
 predSet = np.zeros((fSteps, N_test-wLen));
 setCnt = 0;
 obsSample = np.zeros((1,N_test-wLen));
+
 for i in np.arange(0,N_test-wLen):
     predSet[setCnt,i-setCnt:i-setCnt+fSteps] = predicted[:,i].conj().transpose()
     if (setCnt+1)==fSteps:
@@ -83,15 +85,16 @@ for i in np.arange(0,N_test-wLen):
         setCnt = 0;
     else:
         setCnt = setCnt + 1;
-    
-print(N_test-wLen)
-#score = predicted[1,:]
-score = predicted[0,:];
+
+score = predicted[0,:]
+
 fig, ax = plt.subplots()
-plt.plot(np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30)
+plt.plot(np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(abs(np.real(datas[0,N_train+wLen:N])))-30,np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30)
 ''',np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30'''
+
 #plt.plot(0:N_test-wLen,10*np.log10(np.abs(score))-30)
 #,np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30
+
 '''
 10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
     1:N_test-wLen,10*log10(abs(score))-30
