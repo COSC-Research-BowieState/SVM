@@ -27,7 +27,7 @@ predPwrStates = pwrStates(:,wLen+1+N_train:N);
 
 %trains the SVM
 theSVM = fitrsvm(trainData',trainLbl','KernelFunction','linear',...
-    'Standardize','on','KernelScale','auto','Solver','ISDA');
+    'Standardize','on','KernelScale','auto','Solver','SMO', 'IterationLimit',1000);
 
 toc
 
@@ -40,6 +40,7 @@ nData = testData;
 for i=1:5
     predicted(i,:) = predict(theSVM, nData')';
     nData = [testData(2:wLen,:); predicted(i,:)];
+    disp(testData(1,:));
 end
 
 toc
@@ -72,7 +73,7 @@ plot(1:N_test-wLen,10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
 legend('Input Signal','Prediction')
 xlabel('Samples')
 ylabel('Magnitude (dBm)')
-title('one-step ahead prediction')
+title('one-step ahead prediction 3')
 
 
 MSE_multistep = zeros(fSteps,1);
@@ -97,7 +98,7 @@ for i=1:fSteps
         legend('Input Signal','Prediction')
         xlabel('Samples')
         ylabel('Magnitude (dBm)')
-        title('multi-step ahead prediction')
+        title('multi-step ahead prediction 2')
     end
 end
 
@@ -238,7 +239,7 @@ plot(1:N_test-wLen,10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
 legend('Input Signal','Prediction')
 xlabel('Samples')
 ylabel('Magnitude (dBm)')
-title('one-step ahead prediction')
+title('one-step ahead prediction 1')
 
 
 
