@@ -27,7 +27,7 @@ predPwrStates = pwrStates(:,wLen+1+N_train:N);
 
 %trains the SVM
 theSVM = fitrsvm(trainData',trainLbl','KernelFunction','linear',...
-    'Standardize','on','KernelScale','auto','Solver','SMO', 'IterationLimit',1000);
+    'Standardize','on','KernelScale','auto','Solver','ISDA', 'IterationLimit',1000);
 
 toc
 
