@@ -27,7 +27,7 @@ predPwrStates = pwrStates(:,wLen+1+N_train:N);
 
 %trains the SVM
 theSVM = fitrsvm(trainData',trainLbl','KernelFunction','linear',...
-    'Standardize','on','KernelScale','auto','Solver','ISDA', 'IterationLimit',1000);
+    'Standardize','on','KernelScale','auto','Solver','ISDA', 'IterationLimit',5000);
 
 toc
 
@@ -67,6 +67,8 @@ score = predicted(1,:); %one step ahead prediction
 %function fitting
 %measure one-step ahead MSE
 MSE_onestep = sum((real(totalAvgPwr(N_train+1+wLen:N))-score).^2)/(N_test-wLen);
+totalPwr_score = 10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30;
+predicted_score= 10*log10(abs(score))-30;
 figure
 plot(1:N_test-wLen,10*log10(abs(real(totalAvgPwr(N_train+1+wLen:N))))-30,...
     1:N_test-wLen,10*log10(abs(score))-30)

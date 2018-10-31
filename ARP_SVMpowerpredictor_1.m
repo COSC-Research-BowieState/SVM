@@ -2,14 +2,25 @@
 
 clear all
 close all
+pwrLevel = -10;
+sampleSize = 390;
+freq = generateFreq(pwrLevel,sampleSize);
+saveFreq(freq,pwrLevel,sampleSize)
+function saveFreq(totalAvgPwr,pwrLvl,sampleSize)
+    s = strcat(num2str(pwrLvl),'Dbm_',num2str(sampleSize),'samples_');
+    file = strcat('Dataset/',s,'svmDataSet.csv');
+    fopen(file,'w+');
+    csvwrite(file,totalAvgPwr.');
+end
 
-lambda1 = 0.8; %on-time decay rate per sample (1s)
-lambda2 = 0.8; %off-time decay rate per sample (0s)
+function f = generateFreq(powerLvl, numberOfSamples)
+lambda1 = 0.8; %on-time decay rate per sample (1s) - Idle time
+lambda2 = 0.8; %off-time decay rate per sample (0s) - Busy time
 kParam1 = 2; %k-parameter for Erlang/gamma distribution (ON)
 kParam2 = 2; %k-parameter for Erlang/gamma distribution (OFF)
 var1 = lambda1; %variance parameter for log-normal distribution (ON)
 var2 = lambda2; %variance parameter for log-normal distribution (OFF)
-N = 30000; %number of samples
+N = numberOfSamples; %number of samples
 occupancy = zeros(1,N);
 stateTrans = [];
 intTimes = [];
@@ -38,6 +49,7 @@ while totalTime < N
                 trueMu = log(((1/lambda1)^2)/sqrt((1/var1)+(1/lambda1)^2));
                 trueSig = sqrt(log((1/var1)/((1/lambda1)^2)+1));
                 period = ceil(lognrnd(trueMu,trueSig)); %assumes mean=var=lambda
+           
         end
         %period = 5; %Uncomment this to make deterministic
         if (totalTime + period) > N %makes sure total time isn't exceeded
@@ -90,8 +102,8 @@ traffic_intensity = mean(occupancy>0); %measures traffic intenisty
 %measures mean signal interarrival
 mean_int = sum(intTimes(1:seqSize-mod(seqSize,2)))/...
     ((seqSize-mod(seqSize,2))/2);
-actual_int = 1/lambda1+1/lambda2; %calculates theoretical interarrival
-
+actual_int = 1/lambda1+1/lambda2; %calculates theoretical interarrival - signal interarrival rate
+disp(actual_int)
 upTimes = intTimes(stateTrans==1); %tracks durations of up times
 downTimes = intTimes(stateTrans==0); %tracks durations of down times
 
@@ -110,7 +122,7 @@ accuracy_i_guess = sum(predicted==occupancy(2:N))/(N-1)
 dLen = 100; %length of the energy detector
 fs = 100e6;
 time = linspace(0,N*dLen/fs,N*dLen);
-powerLvl = -40; %power in dBm
+%powerLvl = -40; power in dBm
 amp = sqrt((10^(powerLvl/10))/1000*(2*50)); %sinusoid amplitude
 noiseVar = 1e-7; %noisefloor variance (1e-6 places noisefloor around -100 dBm)
 noisefloor = sqrt(noiseVar)*randn(1,N*dLen);
@@ -139,8 +151,8 @@ for i=1:dLen*N-dLen+1
 end
 %fileID = fopen('svmDataSet.txt','w+');
 %fprintf(fileID,totalAvgPwr.');
-csvwrite('svmDataSet.csv',totalAvgPwr.');
-csvwrite('svmDataSet.txt',totalAvgPwr.');
+%csvwrite('data/svmDataSet.csv',totalAvgPwr.');
 %Observed states based on energy detector
+f = totalAvgPwr;
 obsState = totalAvgPwr > thresh;
-
+end
