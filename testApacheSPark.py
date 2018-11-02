@@ -10,14 +10,6 @@ from pyspark.mllib.classification import SVMWithSGD, SVMModel
 from pyspark.mllib.regression import LabeledPoint
 import pandas as pd
 
-sample_len = 5
-data = pd.read_csv('svmDataSet.csv', header=None,sep='\n')
-data = data[data.columns[0:]].values
-parsedData = data.transpose()
 
-
-# Build the model
-model = SVMWithSGD.train(parsedData, iterations=100)
-
-# Evaluating the model on training data
-labelsAndPreds = parsedData.map(lambda p: (p.label, model.predict(p.features)))
+def test(test):
+    return "hello world"+test;

@@ -13,6 +13,7 @@ import sklearn.svm as svm
 import pandas as pd
 from datetime import datetime
 import sklearn.metrics as metrics
+from testApacheSPark import test
 
 
 def rmse(predictions, targets):
@@ -21,7 +22,7 @@ def rmse(predictions, targets):
 N = 300
 dLen = 100 #length of the energy detector
 N_train = dLen*N//2-dLen+1; #training data length - 14901
-
+print(test("ok"))
 #Training label ground truth/target
 wLen = 5*dLen; 
 N_test = (dLen*N//2); #test data length - 15000
@@ -105,12 +106,7 @@ prediction_score = 10*np.log10(np.abs(score))-30
 accuracy_percent = ((np.abs(totalPwr_score) - np.abs(prediction_score)) + np.abs(prediction_score))/100 # Accuracy rate as a percent 
 #test_01 = np.zeros((N_test-wLen))
 test_01 = np.zeros((10))
-#test_01=(rmse(np.abs(prediction_score), np.abs(totalPwr_score))/100)
-for i in range(0,lambda1,):
-    test_01[i]=(rmse(np.abs(prediction_score), np.abs(totalPwr_score))/100)
-hubert = np.linspace(0,lambda2,N_test-wLen)
 score_trans = test_01.transpose()  
-lambda_range = np.array([i for i in np.arange(lambda1)]);
 subplot_range = np.array([i for i in np.arange(N_test-wLen)]);
 fig = plt.figure(figsize=(10,10))
 plt.subplot(2,1,1)
@@ -124,9 +120,9 @@ plt.ylabel('Magnitude (dBm)')
 plt_two = plt.subplot(2,1,2)
 
 plt_twox = plt_two.twinx()
-plt_two.plot(score_trans,lambda_range)
+plt_two.plot(score_trans,subplot_range)
 
-plt_twox.plot(lambda_range,score_trans)
+plt_twox.plot(subplot_range,score_trans)
 #plt_one.title('Prediction Accuracy %')
 #plt_one.legend(['Input Signal','Prediction'])
 plt_two.set_xlabel('Busy Time')
