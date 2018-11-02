@@ -14,6 +14,7 @@ import pandas as pd
 from datetime import datetime
 import sklearn.metrics as metrics
 
+
 def rmse(predictions, targets):
     return np.sqrt(((predictions - targets) ** 2).mean())
 
@@ -39,7 +40,7 @@ for i in np.arange(wLen,N_train-1):
     trainLbl.itemset(r,datas[0,i]);
     r = r +1;
     
-#Traing and test input data
+#Training and test input data
 trainData = np.zeros((wLen,N_train-wLen));
 testData = np.zeros((wLen,N_test-wLen));
 trailData = np.zeros((wLen,N_test-wLen));
