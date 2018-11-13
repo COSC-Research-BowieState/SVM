@@ -126,7 +126,7 @@ plt_twox.plot(subplot_range,accuracy_percent)
 plt_two.set_xlabel('Busy Time')
 plt_two.set_ylabel('Idle Time')
 plt_twox.set_ylabel('Prediction Accuracy %')
-fig_name = N
+
 plt.savefig("image1.png")
 plt.show()
 print(datetime.now())

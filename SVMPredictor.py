@@ -211,7 +211,6 @@ plt_two.set_xlabel('Busy Time')
 plt_two.set_ylabel('Idle Time')
 plt_twox.set_ylabel('Prediction Accuracy %')
         
-#s.generatereqByLambda(lambda1,lambda2,numberOfSamples)
 '''
 totalPwrLvl = arp.generateFreqEnergy(arp,lambda1,lambda2,numberOfSamples)
 saveARPData(totalPwrLvl)
