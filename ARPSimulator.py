@@ -17,7 +17,8 @@ import time as tic
 class ARPSimulator:
 
     
-    def genetateFreqEnergy(self,lambda1, lambda2, numberOfSamples):
+    def generateFreqEnergy(self,lambda1, lambda2, numberOfSamples):
+
         pi = m.pi
 
         tic.clock()
@@ -35,8 +36,8 @@ class ARPSimulator:
         upTimes = []
         downTimes = []
         intTimesSeq = [] #counts and tracks intervals
-        upDist = "exp"    #'exp', 'erl', or 'lnorm'
-        downDist = "exp"  #'exp', 'erl', or 'lnorm'
+        upDist = "lnorm"    #'exp', 'erl', or 'lnorm'
+        downDist = "lnorm"  #'exp', 'erl', or 'lnorm'
         
         #process initialized to "on"
         
@@ -135,42 +136,11 @@ class ARPSimulator:
         totalAvgPwr = np.zeros((dLen*N-dLen+1))
         trueState = np.zeros((dLen*N-dLen+1))
         #pwrStates = np.zeros((dLen, dLen*N-dLen+1))
-        
-        print(tic.clock())
+
         
         for i in range(dLen*N-dLen+1):
             totalAvgPwr[i] = sum(np.abs(inputRF[i:i+dLen])**2)/dLen
             #pwrStates[:,i] = np.arange(i,i+dLen)
             trueState[i] = int(sum(occSwitch[i:i+dLen]) > 0) 
-            
-        print(tic.clock())
-        
-        #Observed states based on energy detector
-        obsState = totalAvgPwr > thresh
-        
-        #Calculates detection accuracy, false alarm rate, and missed detection rate
-        #detection accuracy evaluated in terms of soonest detection
-        #dAcc = sum([obsState[i]==occSwitch[i+dLen-1] for i in range(dLen*N-dLen+1)])/(dLen*N-dLen+1)
-        dAcc = sum(obsState==occSwitch[range(dLen-1,dLen*N)])/(dLen*N-dLen+1)
-        dAcc_strict = sum(obsState==trueState)/(dLen*N-dLen+1)
-        
-        print(tic.clock())
-        
-        pwrCoherent = totalAvgPwr[range(0,dLen*N-dLen+1,dLen)]
-        #coherent detection accuracy with the window jumping by dLen samples
-        #per observations
-        dAcc_coherent = sum(occupancy==obsState[range(0,dLen*N-dLen+1,dLen)])/N
-        faRate = sum(obsState*np.logical_not(occSwitch[range(dLen-1,dLen*N)]))/(dLen*N-dLen+1)
-        mdRate = sum(np.logical_not(obsState)*occSwitch[range(dLen-1,dLen*N)])/(dLen*N-dLen+1)
-        
-        faRate_strict = sum(obsState*np.logical_not(trueState))/(dLen*N-dLen+1)
-        mdRate_strict = sum(np.logical_not(obsState)*trueState)/(dLen*N-dLen+1)
-        
-        print(tic.clock())
-        print('Time domian signal generated')
         
         return totalAvgPwr;
-
-
-a = ARPSimulator()
-a.genetateFreqEnergy(0.9,0.8,100);

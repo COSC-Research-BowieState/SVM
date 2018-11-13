@@ -22,7 +22,7 @@ def rmse(predictions, targets):
 N = 300
 dLen = 100 #length of the energy detector
 N_train = dLen*N//2-dLen+1; #training data length - 14901
-print(test("ok"))
+
 #Training label ground truth/target
 wLen = 5*dLen; 
 N_test = (dLen*N//2); #test data length - 15000
@@ -99,18 +99,16 @@ for i in np.arange(0,N_test-wLen):
 score = predicted[1,:]
 
 ''' Retrieve Total Power and Prediction scores'''
-lambda1 = 10;
-lambda2 = 0.8;
+
 totalPwr_score = 10*np.log10(np.abs(np.real(datas[0,N_train+wLen:N])))-30;
 prediction_score = 10*np.log10(np.abs(score))-30
 accuracy_percent = ((np.abs(totalPwr_score) - np.abs(prediction_score)) + np.abs(prediction_score))/100 # Accuracy rate as a percent 
-#test_01 = np.zeros((N_test-wLen))
+
 test_01 = np.zeros((10))
 score_trans = test_01.transpose()  
 subplot_range = np.array([i for i in np.arange(N_test-wLen)]);
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(30,10))
 plt.subplot(2,1,1)
-#plt.plot(np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(abs(np.real(datas[0,N_train+wLen:N])))-30,np.array([i for i in np.arange(N_test-wLen)]),10*np.log10(np.abs(score))-30)
 plt.plot(subplot_range,totalPwr_score,subplot_range,prediction_score)
 
 plt.title('one-step ahead prediction')
@@ -120,15 +118,16 @@ plt.ylabel('Magnitude (dBm)')
 plt_two = plt.subplot(2,1,2)
 
 plt_twox = plt_two.twinx()
-plt_two.plot(score_trans,subplot_range)
+plt_two.plot(accuracy_percent,subplot_range)
 
-plt_twox.plot(subplot_range,score_trans)
+plt_twox.plot(subplot_range,accuracy_percent)
 #plt_one.title('Prediction Accuracy %')
 #plt_one.legend(['Input Signal','Prediction'])
 plt_two.set_xlabel('Busy Time')
 plt_two.set_ylabel('Idle Time')
 plt_twox.set_ylabel('Prediction Accuracy %')
-
+fig_name = N
+plt.savefig("image1.png")
 plt.show()
 print(datetime.now())
 
