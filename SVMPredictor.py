@@ -13,11 +13,13 @@ from datetime import datetime
 from ARPSimulator import ARPSimulator as arp
 import csv
 from sklearn.metrics import mean_squared_error
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
 
 numberOfSamples = 300
 lambda1 = 0.8;
 lambda2 = 0.8;
+rng = np.random.RandomState(42)
 class SVMPredictor:
     def calcAccuracy(self, lambda1, lambda2):
         return 0;
@@ -67,7 +69,7 @@ class SVMPredictor:
         
         #model = LogisticRegressionWithLBFGS.train(parsePoint(train_reshape,label_reshape))
         
-        clf = svm.LinearSVR(epsilon=10e-12, C=10e12, max_iter=100, dual=True,random_state=0,loss='squared_epsilon_insensitive',tol=10e-11).fit(train_reshape,label_reshape)
+        clf = svm.LinearSVR(epsilon=10e-12, C=10e12, max_iter=10, dual=True,random_state=0,loss='squared_epsilon_insensitive',tol=10e-11).fit(train_reshape,label_reshape)
         fSteps = dLen; #tracks number of future steps to predict
 
         predicted = np.zeros((fSteps, N_test-wLen));
@@ -145,6 +147,7 @@ class SVMPredictor:
                 lambda1_range.itemset(s,accuracy)
                 lambda2_range.itemset(s,accuracy)
                 s = s + 1;
+                
             r = r+1;
         return 0;
     
@@ -181,6 +184,13 @@ lambda1_range = np.zeros((lst,lst))
 lambda2_range =np.zeros((lst,lst))
 r = 0;
 
+fig = plt.figure(figsize=(20,10))
+plt_two = plt.subplot(2,1,1)
+plt_twox = plt_two.twinx()
+#cmap = plt.get_cmap('PiYG')
+#norm = BoundaryNorm(levels,ncolors=cmap, clip=True)
+#plt_two.pcolormesh(plt_range,lambda1_range[0,:],plt_range,lambda1_range[0,:],cmap=cmap,norm=norm)
+#axins = zoomed_inset_axes(plt_two, 2.5, loc=2) 
 plt_range = np.array([i for i in np.arange(lambda_range,lambda1,lambda_range)]);
 for i in np.arange(lambda_range,lambda1,lambda_range):
     s = 0;
@@ -196,20 +206,22 @@ for i in np.arange(lambda_range,lambda1,lambda_range):
         score = prediction[1,:]
         accuracy = svmp.calculateAccuracy(score, powerLvlLambda, numberOfSamples)
         lambda1_range.itemset((r,s),accuracy/100)
+        colors = i+j
+        #plt.axis([0,lambda1,0,lambda2])
+        #plt.text(i,j,lambda1_range[r,s])
+        plt.scatter(i,j,c=colors, s=(accuracy)*15, alpha=0.3,cmap='viridis')
+
         s = s + 1;
     r = r+1;
-plt.figure(figsize=(20,10))
-plt_two = plt.subplot(2,1,1)
-plt_twox = plt_two.twinx()
-#axins = zoomed_inset_axes(plt_two, 2.5, loc=2) 
-plt_two.plot(plt_range,plt_range)
+    
 
-plt_twox.plot(plt_range,lambda1_range[1,:])
+
 #plt_one.title('Prediction Accuracy %')
 #plt_one.legend(['Input Signal','Prediction'])
-plt_two.set_xlabel('Busy Time')
-plt_two.set_ylabel('Idle Time')
-plt_twox.set_ylabel('Prediction Accuracy %')
+#plt_two.set_xlabel('Busy Time')
+#plt_two.set_ylabel('Idle Time')
+#plt_twox.set_ylabel('Prediction Accuracy %')
+plt.colorbar()
         
 '''
 totalPwrLvl = arp.generateFreqEnergy(arp,lambda1,lambda2,numberOfSamples)
