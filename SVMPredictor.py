@@ -13,12 +13,8 @@ from datetime import datetime
 from ARPSimulator import ARPSimulator as arp
 import csv
 from sklearn.metrics import mean_squared_error
-from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import MaxNLocator
 
-numberOfSamples = 300
-lambda1 = 0.8;
-lambda2 = 0.8;
+
 rng = np.random.RandomState(42)
 class SVMPredictor:
     def calcAccuracy(self, lambda1, lambda2):
@@ -33,7 +29,7 @@ class SVMPredictor:
         wLen = 5*dLen; 
         N_test = dLen*N//2; #test data length - 15000
         N = N_train+N_test; #total data length - 29901
-        #plt.plot( np.array([i for i in np.arange(np.size(datas))]),data)
+
         sample_len = 5
         
         #input window length
@@ -66,8 +62,6 @@ class SVMPredictor:
         
         label_reshape = trainLbl.reshape((N_train-wLen))
         train_reshape = trainData.transpose()
-        
-        #model = LogisticRegressionWithLBFGS.train(parsePoint(train_reshape,label_reshape))
         
         clf = svm.LinearSVR(epsilon=10e-12, C=10e12, max_iter=10, dual=True,random_state=0,loss='squared_epsilon_insensitive',tol=10e-11).fit(train_reshape,label_reshape)
         fSteps = dLen; #tracks number of future steps to predict
@@ -126,30 +120,36 @@ class SVMPredictor:
         plt.show()
 
     def generatereqByLambda(self,lambda1, lambda2,numberOfSamples):
-        lst = len(np.arange(0.01,lambda1,0.01)) # Get the length of the lambda range
+        lambda_range=0.01
+        lst = len(np.arange(lambda_range,lambda1,lambda_range)) # Get the length of the lambda range
          
-        lambda1_range = np.zeros((lst+1))
-        lambda2_range = np.zeros((lst+1))
+        lambda1_range = np.zeros((lst,lst))
         r = 0;
-        s = 0;
-        for i in np.arange(0.1,lambda1,0.1):
-            for j in np.arange(0.1,lambda2, 0.1):
+        
+        plt.figure(figsize=(20,10))
+        plt.subplot(1,1,1)
+        #cmap = plt.get_cmap('PiYG')
+        #norm = BoundaryNorm(levels,ncolors=cmap, clip=True)
+        #plt_two.pcolormesh(plt_range,lambda1_range[0,:],plt_range,lambda1_range[0,:],cmap=cmap,norm=norm)
+        #axins = zoomed_inset_axes(plt_two, 2.5, loc=2) 
+        #plt_range = np.array([i for i in np.arange(lambda_range,lambda1,lambda_range)]);
+        for i in np.arange(lambda_range,lambda1,lambda_range):
+            s = 0;
+            for j in np.arange(lambda_range,lambda2, lambda_range):
                 
-                totalPwrLvl = arp.generateFreqEnergy(arp,i,j,numberOfSamples)
-                powerData = pd.DataFrame(np.array(totalPwrLvl).reshape(-1,1),totalPwrLvl)
-                powerData = powerData[powerData.columns[0:]].values
-                powerLvlLambda = powerData.transpose()
+                powerLvlLambda = svmp.generateFreqData(lambda1,lambda2,numberOfSamples)
                 
                 prediction = svmp.predictor(numberOfSamples,powerLvlLambda)
                 
                 score = prediction[1,:]
                 accuracy = svmp.calculateAccuracy(score, powerLvlLambda, numberOfSamples)
-                lambda1_range.itemset(s,accuracy)
-                lambda2_range.itemset(s,accuracy)
+                lambda1_range.itemset((r,s),accuracy/100)
+                colors = i+j
+                plt.scatter(i,j,c=colors, s=(accuracy)*15, alpha=0.3,cmap='viridis')
+        
                 s = s + 1;
-                
             r = r+1;
-        return 0;
+        plt.colorbar()
     
     def saveARPData(self, data):
         with open("svmDataSet.csv", 'w') as arp_dataset:
@@ -160,7 +160,14 @@ class SVMPredictor:
     def load_data(self, fileName):
         data = pd.read_csv(fileName, header=None,sep='\n')
         data = data[data.columns[0:]].values
-        return data.transpose()
+        return data.transpose();
+    
+    def generateFreqData(self,lambda1,lambda2,numberOfSamples):
+        totalPwrLvl = arp.generateFreqEnergy(arp,lambda1,lambda2,numberOfSamples)
+        powerData = pd.DataFrame(np.array(totalPwrLvl).reshape(-1,1),totalPwrLvl)
+        powerData = powerData[powerData.columns[0:]].values
+        powerLvlLambda = powerData.transpose();
+        return powerLvlLambda;
     
     def calculateAccuracy(self, score, powerLvl,sampleSize):
         dLen = 100 #length of the energy detector
@@ -177,52 +184,14 @@ class SVMPredictor:
         return rmse;
     
 svmp = SVMPredictor()
-lambda_range=0.1
-lst = len(np.arange(lambda_range,lambda1,lambda_range)) # Get the length of the lambda range
- 
-lambda1_range = np.zeros((lst,lst))
-lambda2_range =np.zeros((lst,lst))
-r = 0;
+numberOfSamples = 300
+lambda1 = 0.8;
+lambda2 = 0.8;
+totalPwrLvl = svmp.generateFreqData(lambda1,lambda2,numberOfSamples)    
+prediction = svmp.predictor(numberOfSamples,totalPwrLvl) 
+svmp.plotSVM(totalPwrLvl, prediction,numberOfSamples)   
 
-fig = plt.figure(figsize=(20,10))
-plt_two = plt.subplot(2,1,1)
-plt_twox = plt_two.twinx()
-#cmap = plt.get_cmap('PiYG')
-#norm = BoundaryNorm(levels,ncolors=cmap, clip=True)
-#plt_two.pcolormesh(plt_range,lambda1_range[0,:],plt_range,lambda1_range[0,:],cmap=cmap,norm=norm)
-#axins = zoomed_inset_axes(plt_two, 2.5, loc=2) 
-plt_range = np.array([i for i in np.arange(lambda_range,lambda1,lambda_range)]);
-for i in np.arange(lambda_range,lambda1,lambda_range):
-    s = 0;
-    for j in np.arange(lambda_range,lambda2, lambda_range):
-        
-        totalPwrLvl = arp.generateFreqEnergy(arp,i,j,numberOfSamples)
-        powerData = pd.DataFrame(np.array(totalPwrLvl).reshape(-1,1),totalPwrLvl)
-        powerData = powerData[powerData.columns[0:]].values
-        powerLvlLambda = powerData.transpose()
-        
-        prediction = svmp.predictor(numberOfSamples,powerLvlLambda)
-        
-        score = prediction[1,:]
-        accuracy = svmp.calculateAccuracy(score, powerLvlLambda, numberOfSamples)
-        lambda1_range.itemset((r,s),accuracy/100)
-        colors = i+j
-        #plt.axis([0,lambda1,0,lambda2])
-        #plt.text(i,j,lambda1_range[r,s])
-        plt.scatter(i,j,c=colors, s=(accuracy)*15, alpha=0.3,cmap='viridis')
-
-        s = s + 1;
-    r = r+1;
-    
-
-
-#plt_one.title('Prediction Accuracy %')
-#plt_one.legend(['Input Signal','Prediction'])
-#plt_two.set_xlabel('Busy Time')
-#plt_two.set_ylabel('Idle Time')
-#plt_twox.set_ylabel('Prediction Accuracy %')
-plt.colorbar()
-        
+svmp.generatereqByLambda(lambda1, lambda2,numberOfSamples)
 '''
 totalPwrLvl = arp.generateFreqEnergy(arp,lambda1,lambda2,numberOfSamples)
 saveARPData(totalPwrLvl)
