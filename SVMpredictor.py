@@ -27,7 +27,7 @@ def rmse(predictions, targets):
 
 lambda1=0.8
 lambda2=0.8
-N = 500
+N = 3000
 dLen = 100 #length of the energy detector
 N_train = dLen*N//2-dLen+1; #training data length - 14901
 
@@ -77,7 +77,7 @@ label_reshape = trainLbl.reshape((N_train-wLen))
 train_reshape = trainData.transpose()
 testData_reshape = testData.transpose()
 
-clf = svm.LinearSVR(epsilon=10e-20, C=10e20, max_iter=300, dual=True,random_state=0,tol=10e-6,verbose=6,loss='squared_epsilon_insensitive').fit(train_reshape,label_reshape)
+clf = svm.LinearSVR(epsilon=10e-20, C=10e20, max_iter=900000, dual=True,random_state=0,tol=10e-6,verbose=6,loss='squared_epsilon_insensitive').fit(train_reshape,label_reshape)
 
 fSteps = dLen; #tracks number of future steps to predict
 score = np.zeros((1,N_test));
@@ -113,7 +113,7 @@ accuracy_percent = ((np.abs(totalPwr_score) - np.abs(prediction_score)) + np.abs
 test_01 = np.zeros((10))
 score_trans = test_01.transpose()  
 subplot_range = np.array([i for i in np.arange(N_test-wLen)]);
-fig = plt.figure(figsize=(30,10))
+fig = plt.figure(figsize=(30,30))
 plt.subplot(2,1,1)
 plt.plot(subplot_range,totalPwr_score,subplot_range,prediction_score)
 
@@ -121,19 +121,9 @@ plt.title('one-step ahead prediction')
 plt.legend(['Input Signal','Prediction'])
 plt.xlabel('Samples')
 plt.ylabel('Magnitude (dBm)')
-plt_two = plt.subplot(2,1,2)
 
-plt_twox = plt_two.twinx()
-plt_two.plot(accuracy_percent,subplot_range)
 
-plt_twox.plot(subplot_range,accuracy_percent)
-#plt_one.title('Prediction Accuracy %')
-#plt_one.legend(['Input Signal','Prediction'])
-plt_two.set_xlabel('Busy Time')
-plt_two.set_ylabel('Idle Time')
-plt_twox.set_ylabel('Prediction Accuracy %')
-
-plt.savefig("500samples_0.8lambda.png")
+plt.savefig("3000samples_0.8lambda900k_iterations.png")
 plt.show()
 print(datetime.now())
 
