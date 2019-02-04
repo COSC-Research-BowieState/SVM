@@ -2,8 +2,8 @@
 
 clear all
 close all
-pwrLevel = -10;
-sampleSize = 390;
+pwrLevel = -40;
+sampleSize = 3000;
 freq = generateFreq(pwrLevel,sampleSize);
 saveFreq(freq,pwrLevel,sampleSize)
 function saveFreq(totalAvgPwr,pwrLvl,sampleSize)
