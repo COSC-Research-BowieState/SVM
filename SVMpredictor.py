@@ -11,12 +11,27 @@ import matplotlib.pyplot as plt
 import sklearn.svm as svm
 import pandas as pd
 from datetime import datetime
+<<<<<<< HEAD
 from sklearn.metrics import mean_squared_error
 
+=======
+import sklearn.metrics as metrics
+import ARPSimulator as arp
+
+def generateFreqData(lambda1,lambda2,numberOfSamples):
+        totalPwrLvl = arp.ARPSimulator.generateFreqEnergy(arp,lambda1,lambda1,numberOfSamples)
+        powerData = pd.DataFrame(np.array(totalPwrLvl).reshape(-1,1),totalPwrLvl)
+        powerData = powerData[powerData.columns[0:]].values
+        powerLvlLambda = powerData.transpose();
+        return powerLvlLambda;
+        
+>>>>>>> 45e373b09fd9f15d987e6a39c430d4bb49364bc4
 def rmse(predictions, targets):
     return np.sqrt(((predictions - targets) ** 2).mean())
 
-N = 300
+lambda1=0.8
+lambda2=0.8
+N = 3000
 dLen = 100 #length of the energy detector
 N_train = dLen*N//2-dLen+1; #training data length - 14901
 
@@ -25,10 +40,8 @@ wLen = 5*dLen;
 N_test = (dLen*N//2); #test data length - 15000
 N = N_train+N_test; #total data length - 29901
 sample_len = 5
-data = pd.read_csv('svmDataSet.csv', header=None,sep='\n')
-data = data[data.columns[0:]].values
-datas = data.transpose()
 
+datas = generateFreqData(lambda1,lambda2,N)
 print(datetime.now())
 #input window length
 trainLbl = np.zeros((1,N_train-wLen));
@@ -65,7 +78,11 @@ label_reshape = trainLbl.reshape((N_train-wLen))
 train_reshape = trainData.transpose()
 testData_reshape = testData.transpose()
 
+<<<<<<< HEAD
 clf = svm.LinearSVR(epsilon=10e-20, C=10e20, max_iter=100, dual=True,random_state=12,tol=10e-6,verbose=6,loss='squared_epsilon_insensitive').fit(train_reshape,label_reshape)
+=======
+clf = svm.LinearSVR(epsilon=10e-20, C=10e20, max_iter=900000, dual=True,random_state=0,tol=10e-6,verbose=6,loss='squared_epsilon_insensitive').fit(train_reshape,label_reshape)
+>>>>>>> 45e373b09fd9f15d987e6a39c430d4bb49364bc4
 
 fSteps = dLen; #tracks number of future steps to predict
 score = np.zeros((1,N_test));
@@ -101,7 +118,7 @@ accuracy_percent = mean_squared_error(totalPwr_score,prediction_score) # Accurac
 test_01 = np.zeros((10))
 score_trans = test_01.transpose()  
 subplot_range = np.array([i for i in np.arange(N_test-wLen)]);
-fig = plt.figure(figsize=(30,10))
+fig = plt.figure(figsize=(30,30))
 plt.subplot(2,1,1)
 plt.plot(subplot_range,totalPwr_score,subplot_range,prediction_score)
 
@@ -109,8 +126,12 @@ plt.title('one-step ahead prediction')
 plt.legend(['Input Signal','Prediction'])
 plt.xlabel('Samples')
 plt.ylabel('Magnitude (dBm)')
+<<<<<<< HEAD
+=======
 
-plt.savefig("image1.png")
+>>>>>>> 45e373b09fd9f15d987e6a39c430d4bb49364bc4
+
+plt.savefig("3000samples_0.8lambda900k_iterations.png")
 plt.show()
 print(datetime.now())
 
