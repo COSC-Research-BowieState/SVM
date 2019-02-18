@@ -16,7 +16,7 @@ import csv
 from sklearn.metrics import mean_squared_error
 import tensorflow as tf
 
-numberOfSamples = 1000
+numberOfSamples = 500
 lambda1 = 0.8;
 lambda2 = 0.8;
 
@@ -85,21 +85,19 @@ class SVMPredictor:
         #print(X_train)
         #print(X_test)
     
-        clf = svm.LinearSVR(epsilon=10e-90, C=10e6, max_iter=5000, dual=True,random_state=0,loss='squared_epsilon_insensitive',tol=10e-3,verbose=10).fit(train_reshape,label_reshape)
+        clf = svm.LinearSVR(epsilon=10e-90, C=10e6, max_iter=1000, dual=True,random_state=0,loss='squared_epsilon_insensitive',tol=10e-3,verbose=10).fit(train_reshape,label_reshape)
         fSteps = dLen; #tracks number of future steps to predict
-
+        
         predicted = np.zeros((fSteps, N_test-wLen));
  
         nData = testData;
         for i in np.arange(0,sample_len):
             predicted[i] = clf.predict(nData.transpose());
-            nData = np.concatenate((testData[1:wLen:,],predicted[i:i+1,:]));
-        
+            #nData = np.concatenate((testData[1:wLen:,],predicted[i:i+1,:]));
         
         predSet = np.zeros((fSteps, N_test-wLen));
         setCnt = 0;
 
-        
         for i in np.arange(0,N_test-wLen):
             predSet[setCnt,i-setCnt:i-setCnt+fSteps] = predicted[:,i].transpose()
             if (setCnt+1)==fSteps:
@@ -108,9 +106,6 @@ class SVMPredictor:
             else:
                 setCnt = setCnt + 1;
         return predicted
-    
-    def plotAccuracy(self, lambda_1,lambda_2):
-        return 0;
     
     def plotSVM(self, totalPwrLvl, prediction,sampleSize):
         dLen = 100 #length of the energy detector
